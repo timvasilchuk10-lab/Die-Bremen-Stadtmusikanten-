@@ -85,6 +85,17 @@ function beginAdventure() {
 
 document.getElementById('beginBtn').addEventListener('click', beginAdventure);
 
+// Mobile: tap anywhere on the title screen to begin (begin button can be
+// clipped on small phone screens / iframe embeds).
+const titleScreen = document.getElementById('titleScreen');
+if (titleScreen) {
+  titleScreen.addEventListener('touchend', (e) => {
+    if (titleScreen.classList.contains('hidden')) return;
+    e.preventDefault();
+    beginAdventure();
+  }, { passive: false });
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 // Win screen → restart the whole game
 // ────────────────────────────────────────────────────────────────────────────
@@ -104,6 +115,16 @@ function restartGame() {
 
 document.getElementById('restartBtn').addEventListener('click', restartGame);
 
+// Mobile: tap anywhere on the win screen to restart.
+const winScreen = document.getElementById('winScreen');
+if (winScreen) {
+  winScreen.addEventListener('touchend', (e) => {
+    if (winScreen.classList.contains('hidden')) return;
+    e.preventDefault();
+    restartGame();
+  }, { passive: false });
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 // Cutscene "Onward"
 // ────────────────────────────────────────────────────────────────────────────
@@ -115,6 +136,17 @@ document.getElementById('cutsceneNext').addEventListener('click', () => {
   if (isScrollOpen()) closeScrollOverlay();
   else                dismissCutscene();
 });
+
+// Mobile: tap anywhere on the cutscene parchment to advance.
+const cutsceneEl = document.getElementById('cutscene');
+if (cutsceneEl) {
+  cutsceneEl.addEventListener('touchend', (e) => {
+    if (!cutsceneEl.classList.contains('show')) return;
+    e.preventDefault();
+    if (isScrollOpen()) closeScrollOverlay();
+    else                dismissCutscene();
+  }, { passive: false });
+}
 
 // Esc / F also close a scroll overlay (scrolls only, not chapter cutscenes).
 document.addEventListener('keydown', (e) => {
@@ -135,10 +167,12 @@ document.getElementById('audioBtn').addEventListener('click', toggleMusic);
 // Once is enough — we keep the listeners short-lived.
 document.addEventListener('click',   () => initAudio(), { once: true });
 document.addEventListener('keydown', () => initAudio(), { once: true });
+document.addEventListener('touchend', () => initAudio(), { once: true });
 
 // Wake the AudioContext if the browser parked it.
 document.addEventListener('click',   wakeUpAudioContext);
 document.addEventListener('keydown', wakeUpAudioContext);
+document.addEventListener('touchend', wakeUpAudioContext);
 
 // ────────────────────────────────────────────────────────────────────────────
 // Canvas resize — keep aspect ratio while filling the viewport.
