@@ -85,16 +85,14 @@ function beginAdventure() {
 
 document.getElementById('beginBtn').addEventListener('click', beginAdventure);
 
-// Mobile: tap anywhere on the title screen to begin (begin button can be
-// clipped on small phone screens / iframe embeds).
-const titleScreen = document.getElementById('titleScreen');
-if (titleScreen) {
-  titleScreen.addEventListener('touchend', (e) => {
-    if (titleScreen.classList.contains('hidden')) return;
-    e.preventDefault();
+// Mobile: tap anywhere to begin (document-level so z-index never blocks it).
+document.addEventListener('touchend', function onFirstTap() {
+  const ts = document.getElementById('titleScreen');
+  if (ts && !ts.classList.contains('hidden')) {
+    document.removeEventListener('touchend', onFirstTap);
     beginAdventure();
-  }, { passive: false });
-}
+  }
+}, { passive: true });
 
 // ────────────────────────────────────────────────────────────────────────────
 // Win screen → restart the whole game
