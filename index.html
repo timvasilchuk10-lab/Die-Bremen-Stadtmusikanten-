@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Die Bremer Stadtmusikanten — The Road to Bremen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&amp;family=Cinzel:wght@400;600;700&amp;family=EB+Garamond:ital,wght@0,400;0,600;1,400&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="container">
+  <canvas id="game" width="960" height="600"></canvas>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div id="companions">
+      <div class="companion-slot active" id="slot-0" data-key="1"><canvas width="40" height="40"></canvas><span class="companion-key">1</span></div>
+      <div class="companion-slot" id="slot-1" data-key="2"><canvas width="40" height="40"></canvas><span class="companion-key">2</span></div>
+      <div class="companion-slot" id="slot-2" data-key="3"><canvas width="40" height="40"></canvas><span class="companion-key">3</span></div>
+      <div class="companion-slot" id="slot-3" data-key="4"><canvas width="40" height="40"></canvas><span class="companion-key">4</span></div>
+    </div>
+    <div id="status">
+      <div id="levelTag"><span id="levelChapter" class="ch">Chapter I</span><br><span id="levelName">The Village</span></div>
+      <div id="score"><span class="note">♪</span><span id="noteCount">0</span> / <span id="noteTotal">0</span></div>
+      <div id="hpDisplay"></div>
+      <div id="scrollDisplay" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- Ability bar -->
+  <div id="abilities">
+    <div class="ability-slot active" id="abil-0">
+      <canvas width="36" height="36"></canvas>
+      <div class="ab-name">Kick</div>
+      <div class="ability-cd"></div>
+      <span class="ability-key">E</span>
+    </div>
+    <div class="ability-slot" id="abil-1">
+      <canvas width="36" height="36"></canvas>
+      <div class="ab-name">Bark</div>
+      <div class="ability-cd"></div>
+      <span class="ability-key">E</span>
+    </div>
+    <div class="ability-slot" id="abil-2">
+      <canvas width="36" height="36"></canvas>
+      <div class="ab-name">Stealth</div>
+      <div class="ability-cd"></div>
+      <span class="ability-key">E</span>
+    </div>
+    <div class="ability-slot" id="abil-3">
+      <canvas width="36" height="36"></canvas>
+      <div class="ab-name">Crow</div>
+      <div class="ability-cd"></div>
+      <span class="ability-key">E</span>
+    </div>
+  </div>
+
+  <button id="audioBtn" title="Toggle music">♪</button>
+
+  <div id="hint"></div>
+  <div id="fPrompt"><span id="fPromptText">Recruit</span></div>
+  <div id="flash"></div>
+
+  <!-- Achievement toast -->
+  <div id="achievement">
+    <div class="ach-icon">📜</div>
+    <div class="ach-text">
+      <div class="ach-title">Achievement Unlocked</div>
+      <div class="ach-name" id="achName">Loremaster of Bremen</div>
+    </div>
+  </div>
+
+  <!-- Title screen -->
+  <div id="titleScreen" class="overlay">
+    <canvas id="titleArtCanvas" width="600" height="320"></canvas>
+    <h1>Die Bremer Stadtmusikanten</h1>
+    <h2>· The Road to Bremen ·</h2>
+    <div class="story">
+      Four old beasts cast aside by cruel masters set out for Bremen, where they dream of becoming town musicians. The road is long, the forests dark, and robbers wait upon the way. Will they reach the gates of the Hanseatic city?
+    </div>
+    <div class="controls-grid">
+      <div class="k">W A S D</div><div class="d">walk in any direction</div>
+      <div class="k">1 2 3 4</div><div class="d">switch between companions</div>
+      <div class="k">F</div><div class="d">recruit · interact · play music</div>
+      <div class="k">E</div><div class="d">use animal's special ability</div>
+      <div class="k">Q</div><div class="d">stack the musicians into a tower</div>
+      <div class="k">M</div><div class="d">toggle background music</div>
+    </div>
+    <button class="begin-btn" id="beginBtn">Begin the Tale</button>
+  </div>
+
+  <!-- Win screen -->
+  <div id="winScreen" class="overlay hidden">
+    <h1>Willkommen in Bremen</h1>
+    <h2>· The Stadtmusikanten Have Arrived ·</h2>
+    <div class="silhouette-row">
+      <canvas width="60" height="60" id="winSil0"></canvas>
+      <canvas width="60" height="60" id="winSil1"></canvas>
+      <canvas width="60" height="60" id="winSil2"></canvas>
+      <canvas width="60" height="60" id="winSil3"></canvas>
+    </div>
+    <div class="story">
+      The bells of the Rathaus ring across the Hanseatic city. Four old companions stand at last upon the bronze pedestal — the donkey, the dog, the cat, the rooster — forever the Bremen Town Musicians.
+    </div>
+    <div style="font-family:'Cinzel',serif;color:var(--gold);font-size:20px;margin:18px 0 26px;letter-spacing:2px;">
+      Musical Notes Gathered<br>
+      <span style="font-family:'MedievalSharp',cursive;font-size:46px;text-shadow:0 0 30px rgba(212,168,67,0.6);" id="finalNotes">0</span>
+    </div>
+    <button class="begin-btn" id="restartBtn">Tell the Tale Again</button>
+  </div>
+
+  <!-- Cutscene parchment -->
+  <div id="cutscene">
+    <div id="parchment">
+      <h2 id="cutsceneTitle">Chapter I</h2>
+      <div id="cutsceneSubtitle">— The Road Begins —</div>
+      <div class="ornament">❦ · ❦ · ❦</div>
+      <div id="cutsceneBody"></div>
+      <div class="ornament">❦</div>
+      <button class="cutscene-btn" id="cutsceneNext">Onward</button>
+    </div>
+  </div>
+
+  <div class="footer">PRESS PLAY 2026 · BREMEN · A TALE OF FOUR COMPANIONS</div>
+
+  <!-- ============ MOBILE TOUCH CONTROLS ============ -->
+  <!-- Hidden on desktop, shown automatically on touch devices -->
+  <div id="mobile-controls" aria-hidden="true">
+    <div id="dpad">
+      <button class="mc-btn dpad-up"    data-key="ArrowUp"    aria-label="Up">▲</button>
+      <button class="mc-btn dpad-left"  data-key="ArrowLeft"  aria-label="Left">◀</button>
+      <button class="mc-btn dpad-right" data-key="ArrowRight" aria-label="Right">▶</button>
+      <button class="mc-btn dpad-down"  data-key="ArrowDown"  aria-label="Down">▼</button>
+    </div>
+    <div id="action-buttons">
+      <button class="mc-btn action-q" data-key="q" aria-label="Stack">Q</button>
+      <button class="mc-btn action-f" data-key="f" aria-label="Action">F</button>
+      <button class="mc-btn action-e" data-key="e" aria-label="Ability">E</button>
+    </div>
+    <div id="companion-buttons">
+      <button class="mc-btn cb" data-key="1">1</button>
+      <button class="mc-btn cb" data-key="2">2</button>
+      <button class="mc-btn cb" data-key="3">3</button>
+      <button class="mc-btn cb" data-key="4">4</button>
+    </div>
+  </div>
+
+  <!-- Rotate-to-landscape hint, only shown on portrait phones -->
+  <div id="rotate-hint">
+    <div>
+      <div style="font-size:64px;margin-bottom:20px;">📱 ↻</div>
+      <div>Bitte Telefon drehen</div>
+      <div style="opacity:.65;margin-top:8px;font-size:18px;">Please rotate your phone</div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
