@@ -198,4 +198,25 @@ resizeCanvas();
 // Go!
 // ────────────────────────────────────────────────────────────────────────────
 
+// iOS-reliable orientation detection for rotate hint.
+// Uses setProperty('important') to beat CSS !important in portrait media query.
+const rotateHint     = document.getElementById('rotate-hint');
+const mobileControls = document.getElementById('mobile-controls');
+function checkOrientation() {
+  if (!rotateHint) return;
+  const isPortrait = window.innerHeight > window.innerWidth;
+  rotateHint.style.setProperty('display', isPortrait ? 'flex' : 'none', 'important');
+  if (mobileControls) {
+    mobileControls.style.setProperty('display', isPortrait ? 'none' : 'block', 'important');
+  }
+}
+window.addEventListener('resize', checkOrientation);
+// iOS fires orientationchange BEFORE dimensions update — check at 100, 300, 600ms
+window.addEventListener('orientationchange', () => {
+  setTimeout(checkOrientation, 100);
+  setTimeout(checkOrientation, 300);
+  setTimeout(checkOrientation, 600);
+});
+checkOrientation();
+
 game.start();
